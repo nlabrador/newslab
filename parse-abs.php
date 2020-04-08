@@ -14,11 +14,11 @@ $dom->load($html);
 $latest = $dom->find('#latestnews')[0];
 $contents = $latest->find('.post-title');
 
-if (file_exists('csvs/abs.csv')) {
-    exec('rm csvs/abs.csv');
+if (file_exists('/home/ubuntu/newslab/csvs/abs.csv')) {
+    exec('rm /home/ubuntu/newslab/csvs/abs.csv');
 }
 
-$match = file_get_contents('match.csv');
+$match = file_get_contents('/home/ubuntu/newslab/match.csv');
 $matches = explode(",", $match);
 
 $entries = [];
@@ -33,6 +33,7 @@ foreach ($contents as $content) {
         $datetime = null;
     }
 
+    $entries = [];
     if ($datetime) {
         $link = $content->find('a')[0];
         $title = $link->text;
@@ -43,7 +44,7 @@ foreach ($contents as $content) {
                 $url = 'https://news.abs-cbn.com' . $link->getAttribute('href');
                 $id = $url;
 
-                if ($entries[$id]) {
+                if (isset($entries[$id])) {
                     continue;
                 }
                 else {
@@ -51,7 +52,7 @@ foreach ($contents as $content) {
 
                     $csv = sprintf("%s,%s,%s\n", $datetime, $title, $url);
 
-                    file_put_contents('csvs/abs.csv', $csv, FILE_APPEND | LOCK_EX);
+                    file_put_contents('/home/ubuntu/newslab/csvs/abs.csv', $csv, FILE_APPEND | LOCK_EX);
                 }
             }
         }

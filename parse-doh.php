@@ -6,8 +6,8 @@ use PHPHtmlParser\Dom;
 //For testing only
 //$html = file_get_contents('doh.html');
 
-//exec("curl -k https://www.doh.gov.ph > /home/ubuntu/doh.html");
-//$html = file_get_contents('/home/ubuntu/doh.html');
+exec("curl -k https://www.doh.gov.ph > /home/ubuntu/doh.html");
+$html = file_get_contents('/home/ubuntu/doh.html');
 
 $dom = new Dom;
 $dom->load($html);

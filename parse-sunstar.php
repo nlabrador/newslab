@@ -14,11 +14,11 @@ $dom->load($html);
 $latest = $dom->find('.topStoriesArticles')[0];
 $contents = $latest->find('.col-right');
 
-if (file_exists('csvs/sunstar.csv')) {
-    exec('rm csvs/sunstar.csv');
+if (file_exists('/home/ubuntu/newslab/csvs/sunstar.csv')) {
+    exec('rm /home/ubuntu/newslab/csvs/sunstar.csv');
 }
 
-$match = file_get_contents('match.csv');
+$match = file_get_contents('/home/ubuntu/newslab/match.csv');
 $matches = explode(",", $match);
 
 $entries = [];
@@ -33,13 +33,15 @@ foreach ($contents as $content) {
         $title2 = $content->find('.title-C16')[0];
         $link = $title2->getAttribute('href');
         $title = $title1->text . " - " . $title2->text;
+        $title = preg_replace('/,/', ' ', $title);
 
+	$entries = [];
         foreach ($matches as $m) {
             if (preg_match("/$m/i", $title)) {
                 $url = $link; 
                 $id = $url;
 
-                if ($entries[$id]) {
+                if (isset($entries[$id])) {
                     continue;
                 }
                 else {
@@ -47,7 +49,7 @@ foreach ($contents as $content) {
 
                     $csv = sprintf("%s,%s,%s\n", $datetime, $title, $url);
 
-                    file_put_contents('csvs/sunstar.csv', $csv, FILE_APPEND | LOCK_EX);
+                    file_put_contents('/home/ubuntu/newslab/csvs/sunstar.csv', $csv, FILE_APPEND | LOCK_EX);
                 }
             }
         }
