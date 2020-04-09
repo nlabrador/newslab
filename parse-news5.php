@@ -48,6 +48,21 @@ foreach ($contents as $content) {
         foreach ($matches as $m) {
             if (preg_match("/$m/i", $title)) {
                 $id = $url;
+                $html = file_get_contents($url);
+
+                $dom = new Dom;
+                $dom->load($html);
+
+                $post = $dom->find('.post-cont');
+                $ps = $post[0]->find('p');
+
+                $summary = '';
+                foreach ($ps as $p) {
+                    $text = $p->text;
+                    $text = preg_replace('/,/', '', $text);
+
+                    $summary = $summary . '<br><br>' . $text;
+                }
 
                 if (isset($entries[$id])) {
                     continue;
@@ -55,7 +70,7 @@ foreach ($contents as $content) {
                 else {
                     $entries[$id] = true;
 
-                    $csv = sprintf("%s,%s,%s\n", $datetime, $title, $url);
+                    $csv = sprintf("%s,%s,%s,%s,%s,%s\n", $datetime, $title, $url,'',$summary,'');
 
                     file_put_contents('/home/ubuntu/newslab/csvs/news5.csv', $csv, FILE_APPEND | LOCK_EX);
                 }

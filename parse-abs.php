@@ -43,6 +43,39 @@ foreach ($contents as $content) {
             if (preg_match("/$m/i", $title)) {
                 $url = 'https://news.abs-cbn.com' . $link->getAttribute('href');
                 $id = $url;
+                $html = file_get_contents($url);
+                $dom = new Dom;
+                $dom->load($html);
+
+                $articleContent = $dom->find('.article-content');
+                $video = '';
+                $img = '';
+                if (isset($articleContent[0])) {
+                    $figures = $articleContent[0]->find('figure');
+
+                    if (isset($figures[0])) {
+                        $img = $figures[0]->find('img');
+                        $img = isset($img[1]) ? $img[1]->getAttribute('src') : '';
+                    }
+
+                    $ps = $articleContent[0]->find('p');
+
+                    $summary = '';
+                    foreach ($ps as $p) {
+                        $text = $p->text;
+                        $text = preg_replace('/,/', ' ', $text);
+                        $summary = $summary . "<br><br>" . $text;
+                    }
+                }
+                else {
+                    $iframe = $dom->find('iframe');
+                    $video = isset($iframe[0]) ? $iframe[0]->getAttribute('src') : '';
+                    $article = $dom->find('article');
+                    $metas = $article[0]->find('meta');
+                    $summary = $metas[9]->getAttribute('content');
+                    $summary = preg_replace('/,/', ' ', $summary);
+                    $img = '';
+                }
 
                 if (isset($entries[$id])) {
                     continue;
@@ -50,7 +83,7 @@ foreach ($contents as $content) {
                 else {
                     $entries[$id] = true;
 
-                    $csv = sprintf("%s,%s,%s\n", $datetime, $title, $url);
+                    $csv = sprintf("%s,%s,%s,%s,%s,%s\n", $datetime, $title, $url,$video,$summary,$img);
 
                     file_put_contents('/home/ubuntu/newslab/csvs/abs.csv', $csv, FILE_APPEND | LOCK_EX);
                 }

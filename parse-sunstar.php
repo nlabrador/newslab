@@ -35,11 +35,32 @@ foreach ($contents as $content) {
         $title = $title1->text . " - " . $title2->text;
         $title = preg_replace('/,/', ' ', $title);
 
-	$entries = [];
+	    $entries = [];
         foreach ($matches as $m) {
             if (preg_match("/$m/i", $title)) {
                 $url = $link; 
                 $id = $url;
+
+                exec("curl $url > sunstar.html");
+                $html = file_get_contents('sunstar.html');
+
+                $dom = new Dom;
+                $dom->load($html);
+
+                $item_div = $dom->find('.img'); 
+                $img = isset($item_div[0]) ? $item_div[0]->find('img') : [];
+                $img = isset($img[0]) ? $img[0]->getAttribute('src') : '';
+
+                if (!$img) {
+                    $item_div = $dom->find('.imgArticle'); 
+                    $img = isset($item_div[0]) ? $item_div[0]->find('img') : [];
+                    $img = isset($img[0]) ? $img[0]->getAttribute('src') : '';
+                }
+
+                $body = $dom->find(".articleBody");
+                $ps = $body[1]->find('p');
+                $summary = $ps[0]->innerHtml();
+                $summary = preg_replace('/,/', '', $summary);
 
                 if (isset($entries[$id])) {
                     continue;
@@ -47,7 +68,7 @@ foreach ($contents as $content) {
                 else {
                     $entries[$id] = true;
 
-                    $csv = sprintf("%s,%s,%s\n", $datetime, $title, $url);
+                    $csv = sprintf("%s,%s,%s,%s,%s,%s\n", $datetime, $title, $url, '', $summary, $img);
 
                     file_put_contents('/home/ubuntu/newslab/csvs/sunstar.csv', $csv, FILE_APPEND | LOCK_EX);
                 }
