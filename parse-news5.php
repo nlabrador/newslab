@@ -61,7 +61,7 @@ foreach ($contents as $content) {
                     $text = $p->text;
                     $text = preg_replace('/,/', '', $text);
 
-                    $summary = $summary . '<br><br>' . $text;
+                    $summary = $summary . $text;
                 }
 
                 if (isset($entries[$id])) {

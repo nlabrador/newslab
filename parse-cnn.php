@@ -54,7 +54,7 @@ foreach ($contents as $content) {
                 if ($p->text != " ") {
                     $text = $p->text;
                     $text = preg_replace('/,/', ' ', $text);
-                    $summary = $summary . "<br><br>" . $text;
+                    $summary = $summary . $text;
                 }
             }
 

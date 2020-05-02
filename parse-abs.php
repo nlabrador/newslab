@@ -64,7 +64,7 @@ foreach ($contents as $content) {
                     foreach ($ps as $p) {
                         $text = $p->text;
                         $text = preg_replace('/,/', ' ', $text);
-                        $summary = $summary . "<br><br>" . $text;
+                        $summary = $summary . $text;
                     }
                 }
                 else {
